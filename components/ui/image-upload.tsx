@@ -11,7 +11,7 @@ interface ImageUploadProps {
   disabled?: boolean;
   onChange: (value: string) => void;
   onRemove: (value: string) => void;
-  value: string[];
+  value: string[] ;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -53,7 +53,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           </div>
         ))}
       </div>
-      <CldUploadWidget onUpload={onUpload} uploadPreset="t4drjppf">
+      <CldUploadWidget onUpload={onUpload} uploadPreset="upload_nextjs">
         {({ open }) => {
           const onClick = () => {
             open();

@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "react-hot-toast"
 import { Trash } from "lucide-react"
-import { Billboard } from "@prisma/client"
+import { Billboard, Image_b } from "@prisma/client"
 import { useParams, useRouter } from "next/navigation"
 
 import { Input } from "@/components/ui/input"
@@ -24,17 +24,18 @@ import { Separator } from "@/components/ui/separator"
 import { Heading } from "@/components/ui/heading"
 import { AlertModal } from "@/components/modals/alert-modal"
 import ImageUpload from "@/components/ui/image-upload"
-
+import { Image } from "@prisma/client"
 const formSchema = z.object({
   label: z.string().min(1),
-  imageUrl: z.string().min(1),
+  images: z.object({ url: z.string() }).array(),
 });
 
 type BillboardFormValues = z.infer<typeof formSchema>
 
 interface BillboardFormProps {
-  initialData: Billboard | null;
-};
+  initialData: Billboard & {
+    images: Image_b[]
+  } | null;};
 
 export const BillboardForm: React.FC<BillboardFormProps> = ({
   initialData
@@ -49,13 +50,16 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
   const description = initialData ? 'Edit a billboard.' : 'Add a new billboard';
   const toastMessage = initialData ? 'Billboard updated.' : 'Billboard created.';
   const action = initialData ? 'Save changes' : 'Create';
-
+  
+  const defaultValues = initialData ? {
+    ...initialData,} : {
+    label: '',
+    images: [],
+ 
+  }
   const form = useForm<BillboardFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      label: '',
-      imageUrl: ''
-    }
+    defaultValues
   });
 
   const onSubmit = async (data: BillboardFormValues) => {
@@ -115,24 +119,24 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
       <Separator />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-          <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Background image</FormLabel>
-                  <FormControl>
-                    <ImageUpload 
-                      value={field.value ? [field.value] : []} 
-                      disabled={loading} 
-                      onChange={(url) => field.onChange(url)}
-                      onRemove={() => field.onChange('')}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <FormField
+            control={form.control}
+            name="images"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Images</FormLabel>
+                <FormControl>
+                  <ImageUpload 
+                    value={field.value.map((image) => image.url)} 
+                    disabled={loading} 
+                    onChange={(url) => field.onChange([...field.value, { url }])}
+                    onRemove={(url) => field.onChange([...field.value.filter((current) => current.url !== url)])}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}

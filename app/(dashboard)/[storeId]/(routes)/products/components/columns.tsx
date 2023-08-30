@@ -5,21 +5,27 @@ import { ColumnDef } from "@tanstack/react-table"
 import { CellAction } from "./cell-action"
 
 export type ProductColumn = {
-  id: string
+  id: string;
   name: string;
+  description: string;
   price: string;
   category: string;
-  size: string;
+  size: string; // Ensure this is a string
   color: string;
+  rating: string;
   createdAt: string;
   isFeatured: boolean;
   isArchived: boolean;
-}
+};
 
 export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "name",
     header: "Name",
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
   },
   {
     accessorKey: "isArchived",
@@ -40,6 +46,25 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "size",
     header: "Size",
+  },
+  {
+    accessorKey: "rating",
+    header: "Rating",
+    cell: ({ row }) => {
+      const ratingValue = parseFloat(row.original.rating); // Convert rating to a number
+
+      // Create an array of filled and empty star icons based on the rating value
+      const stars = Array.from({ length: 5 }, (_, index) => (
+        <span
+          key={index}
+          className={`text-yellow-500 ${
+            index < ratingValue ? "fas" : "far"
+          } fa-star`}
+        />
+      ));
+
+      return <div className="flex items-center gap-x-1">{stars}</div>;
+    },
   },
   {
     accessorKey: "color",
