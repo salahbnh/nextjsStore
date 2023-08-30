@@ -2,11 +2,15 @@ export interface Product {
   id: string;
   category: Category;
   name: string;
+  description: string;
   price: string;
+  rating: string;
   isFeatured: boolean;
   size: Size;
   color: Color;
-  images: Image[]
+  images: Image[],
+  quantity: number// Add the quantity property
+
 };
 
 export interface Image {
@@ -17,7 +21,7 @@ export interface Image {
 export interface Billboard {
   id: string;
   label: string;
-  imageUrl: string;
+  images: Image[]
 };
 
 export interface Category {

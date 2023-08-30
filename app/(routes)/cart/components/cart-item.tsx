@@ -1,27 +1,37 @@
 import Image from "next/image";
 import { toast } from "react-hot-toast";
-import { X } from "lucide-react";
+import { X, Plus, Minus } from "lucide-react"; // Import Plus and Minus icons
 
 import IconButton from "@/components/ui/icon-button";
 import Currency from "@/components/ui/currency";
 import useCart from "@/hooks/use-cart";
 import { Product } from "@/types";
 
-
 interface CartItemProps {
   data: Product;
 }
 
-const CartItem: React.FC<CartItemProps> = ({
-  data
-}) => {
+const CartItem: React.FC<CartItemProps> = ({ data }) => {
   const cart = useCart();
 
   const onRemove = () => {
     cart.removeItem(data.id);
   };
 
-  return ( 
+  const incrementQuantity = () => {
+    const updatedItem = { ...data, quantity: data.quantity + 1 };
+    cart.updateItem(updatedItem);
+  };
+
+  const decrementQuantity = () => {
+    if (data.quantity <= 1) {
+      return;
+    }
+    const updatedItem = { ...data, quantity: data.quantity - 1 };
+    cart.updateItem(updatedItem);
+  };
+
+  return (
     <li className="flex py-6 border-b">
       <div className="relative h-24 w-24 rounded-md overflow-hidden sm:h-48 sm:w-48">
         <Image
@@ -37,20 +47,34 @@ const CartItem: React.FC<CartItemProps> = ({
         </div>
         <div className="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
           <div className="flex justify-between">
-            <p className=" text-lg font-semibold text-black">
-              {data.name}
-            </p>
+            <p className="text-lg font-semibold text-black">{data.name}</p>
           </div>
-
           <div className="mt-1 flex text-sm">
             <p className="text-gray-500">{data.color.name}</p>
-            <p className="ml-4 border-l border-gray-200 pl-4 text-gray-500">{data.size.name}</p>
+            <p className="ml-4 border-l border-gray-200 pl-4 text-gray-500">
+              {data.size.name}
+            </p>
           </div>
-          <Currency value={data.price} />
+          <Currency value={Number(data.price) * Number(data.quantity)} />
+        </div>
+        <div className="flex items-center mt-2">
+          <button
+            onClick={decrementQuantity}
+            className="mr-2 text-gray-500"
+            disabled={data.quantity <= 1}
+          >
+            <Minus size={16} />
+          </button>
+          <p className="text-lg font-semibold text-black">
+            Quantité: {data.quantity}
+          </p>
+          <button onClick={incrementQuantity} className="ml-2 text-gray-500">
+            <Plus size={16} />
+          </button>
         </div>
       </div>
     </li>
   );
-}
- 
+};
+
 export default CartItem;
